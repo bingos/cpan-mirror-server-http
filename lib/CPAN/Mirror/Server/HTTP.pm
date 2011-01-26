@@ -89,7 +89,8 @@ sub run {
 
   $SIG{CHLD} = \&_REAPER;
 
-  my $httpd = HTTP::Daemon->new( LocalPort => $port );
+  my $httpd = HTTP::Daemon->new( LocalPort => $port )
+                or die "$!\n";
 
   while ( 1 ) {
     my $conn = $httpd->accept;
@@ -111,7 +112,6 @@ sub _handle_request {
   my $conn = shift;
   my $root = shift;
   REQ: while (my $req = $conn->get_request) {
-    warn $req->as_string;
     if ($req->method eq 'GET' ) {
       # Special case /icons
       if ( my ($icon) = $req->uri->path =~ m#^/icons/(back|blank|compressed|folder|unknown)\.gif$# ) {
@@ -121,7 +121,6 @@ sub _handle_request {
       }
       my @path = $req->uri->path_segments;
       my $path = File::Spec->catfile( $root, @path );
-      warn $path, "\n";
       if ( -d $path and $req->uri->path !~ m#/$# ) {
         my $resp = _gen_301( $req->uri );
         $conn->send_response( $resp );
