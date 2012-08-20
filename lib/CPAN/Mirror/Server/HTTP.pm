@@ -112,7 +112,7 @@ sub _handle_request {
   my $conn = shift;
   my $root = shift;
   REQ: while (my $req = $conn->get_request) {
-    if ($req->method eq 'GET' ) {
+    if ($req->method eq 'GET' or $req->method eq 'HEAD') {
       # Special case /icons
       if ( my ($icon) = $req->uri->path =~ m#^/icons/(back|blank|compressed|folder|unknown)\.gif$# ) {
         my $resp = _gen_icon( $icon );
